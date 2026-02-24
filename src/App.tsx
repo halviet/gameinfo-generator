@@ -1,35 +1,47 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import EmptyConfig from "@/components/empty-config.tsx";
+import Header from "@/components/header.tsx";
+import Dropzone from "@/components/ui/dropzone.tsx";
+import Disclaimer from "@/components/disclaimer.tsx";
+import {Toaster} from "@/components/ui/sonner.tsx";
+import {useState} from "react";
+import {type KVObject} from "s2-gameinfo";
+import Editor from "@/components/editor.tsx";
+import SelectTemplate from "@/components/blocks/select-template.tsx";
+import {toast} from "sonner";
 
 function App() {
-  const [count, setCount] = useState(0)
+    const [gi, setGI] = useState<KVObject | null>(null)
+    const [template, setTemplate] = useState<string>("piggy")
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    const selectTemplate = (tmpl: string) => {
+        if (tmpl === "") {
+            toast.error("No template was selected!");
+            return;
+        }
+
+        setTemplate(tmpl);
+        setGI({});
+    }
+
+    return (
+        <div className="px-2 md:px-4 lg:px-0">
+            <Header/>
+            <main className="max-w-5xl w-full mx-auto h-full flex flex-col gap-8 justify-center items-center">
+                <Disclaimer/>
+
+                {(gi === null || gi === undefined) ?
+                    <EmptyConfig>
+                        <SelectTemplate selectTemplate={selectTemplate}/>
+                        or
+                        <Dropzone setGI={setGI}/>
+                    </EmptyConfig>
+                    : <Editor gi={gi} setGI={setGI}/>
+                }
+
+                <Toaster/>
+            </main>
+        </div>
+    )
 }
 
 export default App
