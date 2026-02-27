@@ -2,7 +2,7 @@
 
 import type {KVObject} from "s2-gameinfo";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover.tsx";
-import {IconInfoCircle} from "@tabler/icons-react";
+import {IconChevronDown, IconInfoCircle} from "@tabler/icons-react";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {
     Field,
@@ -18,22 +18,36 @@ import {Switch} from "./ui/switch";
 import KeyValue from "@/components/blocks/kv.tsx";
 import KVCategory from "@/components/blocks/kv-category.tsx";
 import {useKVManager} from "@/hooks/useKVManager.ts";
+import {ButtonGroup} from "@/components/ui/button-group.tsx";
+import {Button} from "@/components/ui/button.tsx";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu.tsx";
+import SelectTemplate from "@/components/blocks/select-template.tsx";
+import type {Template} from "@/types/template.ts";
+import {type Dispatch, type SetStateAction, useMemo} from "react";
 
 interface Props {
     gi: KVObject;
-    selectTemplate: (template: string) => void;
+    setGI: Dispatch<SetStateAction<KVObject | null>>;
+    selectTemplate: (template: Template) => void;
     template: string;
 }
 
-export default function Editor({gi, selectTemplate, template}: Props) {
+export default function Editor({gi, setGI, selectTemplate, template}: Props) {
+    const conVars = useMemo(() => gi["ConVars"] as KVObject, [gi]);
     const {
         categories,
         // addKV,
         removeKV,
         updateKV,
-    } = useKVManager(gi["ConVars"] as KVObject)
+    } = useKVManager(conVars)
 
     console.log("Editor: gi:", gi["ConVars"])
+    console.log("Editor: ConVars:", conVars)
     console.log("Editor: Categories from useKVManager:", categories)
 
     return (
@@ -61,7 +75,7 @@ export default function Editor({gi, selectTemplate, template}: Props) {
                                 {template != "" &&
                                     <Field>
                                         <FieldLabel>Template</FieldLabel>
-                                        <Select defaultValue={template} onValueChange={(e) => selectTemplate(e)}>
+                                        <Select defaultValue={template} onValueChange={(e) => selectTemplate(e as Template)}>
                                             <SelectTrigger>
                                                 <SelectValue/>
                                             </SelectTrigger>
@@ -76,13 +90,6 @@ export default function Editor({gi, selectTemplate, template}: Props) {
                                         <FieldDescription>Template description</FieldDescription>
                                     </Field>
                                 }
-
-                                <Field>
-                                    <FieldLabel>Output file</FieldLabel>
-                                    <Input id="output" type="text" defaultValue="gameinfo.gi"
-                                           placeholder="gameinfo.gi"/>
-                                    <FieldDescription>Template description</FieldDescription>
-                                </Field>
                             </div>
                         </FieldGroup>
                     </FieldSet>
@@ -95,8 +102,7 @@ export default function Editor({gi, selectTemplate, template}: Props) {
                                         <FieldContent>
                                             <FieldTitle>Enable mods support</FieldTitle>
                                             <FieldDescription>
-                                                Focus is shared across devices, and turns off when you leave the
-                                                app.
+                                                Adds path for mods in SearchPaths
                                             </FieldDescription>
                                         </FieldContent>
                                         <Switch id="mods" defaultChecked/>
@@ -108,17 +114,62 @@ export default function Editor({gi, selectTemplate, template}: Props) {
                                         <FieldContent>
                                             <FieldTitle>Modify whole gameinfo.gi</FieldTitle>
                                             <FieldDescription>
-                                                Focus is shared across devices, and turns off when you leave the
-                                                app.
+                                                Allows to modify values outside of a ConVars scope.
                                             </FieldDescription>
                                         </FieldContent>
-                                        <Switch id="fullgameinfo"/>
+                                        <Switch id="fullgameinfo" disabled/>
                                     </Field>
                                 </FieldLabel>
                             </div>
                         </FieldGroup>
                     </FieldSet>
                 </div>
+            </section>
+
+            <section className="w-full flex flex-col gap-4">
+                <div className="flex gap-2 items-center">
+                    <h1 className="scroll-m-20 text-2xl font-semibold tracking-tight">Exporting</h1>
+                </div>
+
+                <FieldSet>
+                    <FieldGroup className="grid grid-cols-2 gap-4">
+                        <Field>
+                            <FieldLabel>Output file</FieldLabel>
+                            <Input id="output" type="text" defaultValue="gameinfo.gi"
+                                   placeholder="gameinfo.gi"/>
+                            <FieldDescription>Template description</FieldDescription>
+                        </Field>
+                    </FieldGroup>
+
+                    <Field className="w-full flex items-end justify-end">
+                        <ButtonGroup>
+                            <ButtonGroup>
+                                <Button variant="destructive" className="cursor-pointer" onClick={() => setGI(null)}>Reset</Button>
+                            </ButtonGroup>
+
+                            {template ===  "" && (
+                                <ButtonGroup>
+                                    <SelectTemplate selectTemplate={selectTemplate} variant="outline"/>
+                                </ButtonGroup>
+                            )}
+
+                            <ButtonGroup>
+                                <Button>Export</Button>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button className="!pl-2">
+                                            <IconChevronDown />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+
+                                    <DropdownMenuContent>
+                                        <DropdownMenuItem>As JSON</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </ButtonGroup>
+                        </ButtonGroup>
+                    </Field>
+                </FieldSet>
             </section>
 
             <section className="w-full flex flex-col gap-4">

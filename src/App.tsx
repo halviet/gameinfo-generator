@@ -4,23 +4,38 @@ import Dropzone from "@/components/ui/dropzone.tsx";
 import Disclaimer from "@/components/disclaimer.tsx";
 import {Toaster} from "@/components/ui/sonner.tsx";
 import {useState} from "react";
-import {type KVObject} from "s2-gameinfo";
+import {type KVObject, parseGI} from "s2-gameinfo";
 import Editor from "@/components/editor.tsx";
 import SelectTemplate from "@/components/blocks/select-template.tsx";
 import {toast} from "sonner";
+import type {Template} from "./types/template";
+
 
 function App() {
     const [gi, setGI] = useState<KVObject | null>(null)
     const [template, setTemplate] = useState<string>("")
 
-    const selectTemplate = (tmpl: string) => {
+    const fetchGiFile = async (filename: string): Promise<string> => {
+        const response = await fetch(`template/gi/${filename}.gi`);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
+        }
+        return response.text(); // Get raw string content
+    };
+
+    const selectTemplate = (tmpl: Template) => {
         if (tmpl === "") {
             toast.error("No template was selected!");
             return;
         }
-
         setTemplate(tmpl);
-        setGI({});
+
+        fetchGiFile(tmpl).then((r) => {
+            setGI(parseGI(r))
+        }).catch((err) => {
+            toast.error(err.message);
+            setTemplate("");
+        })
     }
 
     return (
@@ -35,7 +50,7 @@ function App() {
                         or
                         <Dropzone setGI={setGI}/>
                     </EmptyConfig>
-                    : <Editor gi={gi} selectTemplate={selectTemplate} template={template}/>
+                    : <Editor gi={gi} setGI={setGI} selectTemplate={selectTemplate} template={template}/>
                 }
 
                 <Toaster/>

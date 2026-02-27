@@ -15,7 +15,7 @@ export default function KVCategory({name, children}: { name: string, children: R
                         <IconChevronDown className="group-data-[state=open]:rotate-180"/>
                     </Button>
                 </CollapsibleTrigger>
-                <CollapsibleContent className="p-4 pt-4">
+                <CollapsibleContent className="p-4 pt-4 flex flex-wrap gap-4">
                     {children}
                 </CollapsibleContent>
             </Collapsible>

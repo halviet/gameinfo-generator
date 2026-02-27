@@ -11,20 +11,22 @@ import {Button} from "@/components/ui/button.tsx";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {useState} from "react";
 import {Field, FieldDescription, FieldLabel} from "@/components/ui/field.tsx";
+import type {Template} from "@/types/template.ts";
 
 interface Props {
-    selectTemplate: (template: string) => void
+    selectTemplate: (template: Template) => void
+    variant?: "default" | "outline"
 }
 
-export default function SelectTemplate({selectTemplate}: Props) {
-    const [tmpl, setTmpl] = useState<string>("piggy")
+export default function SelectTemplate({selectTemplate, variant = "default"}: Props) {
+    const [tmpl, setTmpl] = useState<Template>("piggy")
     const [open, setOpen] = useState<boolean>(false)
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
 
             <DialogTrigger asChild>
-                <Button>Select template</Button>
+                <Button variant={variant}>Select template</Button>
             </DialogTrigger>
 
             <DialogContent>
@@ -35,7 +37,6 @@ export default function SelectTemplate({selectTemplate}: Props) {
                         setOpen(false);
                     }}
                 >
-
                     <DialogHeader>
                         <DialogTitle>Choose a Template</DialogTitle>
                         <DialogDescription>
@@ -48,7 +49,7 @@ export default function SelectTemplate({selectTemplate}: Props) {
                     <div className="my-4">
                         <Field>
                             <FieldLabel>Template</FieldLabel>
-                            <Select defaultValue="piggy" onValueChange={(e) => setTmpl(e)}>
+                            <Select defaultValue="piggy" onValueChange={(e) => setTmpl(e as Template)}>
                                 <SelectTrigger className="min-w-60">
                                     <SelectValue/>
                                 </SelectTrigger>

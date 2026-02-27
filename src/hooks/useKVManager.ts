@@ -1,7 +1,7 @@
 'use client';
 
 import type {KVObject, KVValue} from "s2-gameinfo";
-import {useCallback, useMemo, useState} from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 import {ConVars} from "@/types/kv.ts";
 import {formatKVValueToString} from "@/lib/utils.ts";
 import {toast} from "sonner";
@@ -14,6 +14,14 @@ export interface CategoryKV {
 
 export function useKVManager(initCV: KVObject) {
     const [cv, setCV] = useState<KVObject>(initCV);
+
+    useEffect(() => {
+        setCV(initCV);
+    }, [initCV]);
+
+    console.log("useKVManager: initCV:", initCV);
+    console.log("useKVManager: cv:", cv);
+
     const categories = useMemo<CategoryKV[]>(() => {
         if (typeof cv !== "object" || Object.keys(cv).length === 0) {
             toast.error("Parsing error: Invalid or empty ConVars value. ConVars will be empty.");
