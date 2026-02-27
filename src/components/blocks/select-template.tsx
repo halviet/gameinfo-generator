@@ -10,6 +10,7 @@ import {
 import {Button} from "@/components/ui/button.tsx";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {useState} from "react";
+import {Field, FieldDescription, FieldLabel} from "@/components/ui/field.tsx";
 
 interface Props {
     selectTemplate: (template: string) => void
@@ -22,7 +23,7 @@ export default function SelectTemplate({selectTemplate}: Props) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
 
-            <DialogTrigger>
+            <DialogTrigger asChild>
                 <Button>Select template</Button>
             </DialogTrigger>
 
@@ -44,23 +45,23 @@ export default function SelectTemplate({selectTemplate}: Props) {
                         </DialogDescription>
                     </DialogHeader>
 
-                    <div className="">
-                        <Select defaultValue="piggy" onValueChange={(e) => setTmpl(e)}>
-                            <SelectTrigger className="min-w-60">
-                                <SelectValue/>
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectItem value="piggy">Piggy</SelectItem>
-                                    <SelectItem value="piggypidjan">Piggy's & pidjan</SelectItem>
-                                    <SelectItem value="maihdenless">Maihdenless</SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-
-                        <p className="leading-7 [&:not(:first-child)]:mt-6 text-muted-foreground text-sm">
-                            Template description
-                        </p>
+                    <div className="my-4">
+                        <Field>
+                            <FieldLabel>Template</FieldLabel>
+                            <Select defaultValue="piggy" onValueChange={(e) => setTmpl(e)}>
+                                <SelectTrigger className="min-w-60">
+                                    <SelectValue/>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectItem value="piggy">Piggy</SelectItem>
+                                        <SelectItem value="piggypidjan">Piggy's & pidjan</SelectItem>
+                                        <SelectItem value="maihdenless">Maihdenless</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                            <FieldDescription>Template description</FieldDescription>
+                        </Field>
                     </div>
 
                     <DialogFooter>

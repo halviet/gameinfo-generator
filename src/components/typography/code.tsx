@@ -1,4 +1,5 @@
 import {cn} from "@/lib/utils.ts";
+import type {ReactNode} from "react";
 
 export default function InlineCode({children, className}: {children: ReactNode, className?: string}) {
     return <code className={cn(

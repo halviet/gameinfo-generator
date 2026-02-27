@@ -11,7 +11,7 @@ import {toast} from "sonner";
 
 function App() {
     const [gi, setGI] = useState<KVObject | null>(null)
-    const [template, setTemplate] = useState<string>("piggy")
+    const [template, setTemplate] = useState<string>("")
 
     const selectTemplate = (tmpl: string) => {
         if (tmpl === "") {
@@ -35,7 +35,7 @@ function App() {
                         or
                         <Dropzone setGI={setGI}/>
                     </EmptyConfig>
-                    : <Editor gi={gi} setGI={setGI}/>
+                    : <Editor gi={gi} selectTemplate={selectTemplate} template={template}/>
                 }
 
                 <Toaster/>
