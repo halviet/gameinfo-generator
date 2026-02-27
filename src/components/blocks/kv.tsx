@@ -39,10 +39,14 @@ export default function KeyValue({kvKey, kvValue, updateKV, removeKV}: Props) {
     });
 
     const onKeyBlur = (newKey: string) => {
+        if (newKey === kvKey) return;
+
         updateKV(kvKey, intValue, newKey);
     }
 
     const onValueBlur = (newValue: string) => {
+        if (newValue === kvValue) return;
+
         updateKV(intKey, newValue);
     }
 

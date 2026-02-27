@@ -28,17 +28,20 @@ import {
 } from "@/components/ui/dropdown-menu.tsx";
 import SelectTemplate from "@/components/blocks/select-template.tsx";
 import type {Template} from "@/types/template.ts";
-import {type Dispatch, type SetStateAction, useMemo} from "react";
+import {useMemo} from "react";
+import {useConfig} from "@/context/context.tsx";
 
 interface Props {
-    gi: KVObject;
-    setGI: Dispatch<SetStateAction<KVObject | null>>;
     selectTemplate: (template: Template) => void;
-    template: string;
 }
 
-export default function Editor({gi, setGI, selectTemplate, template}: Props) {
-    const conVars = useMemo(() => gi["ConVars"] as KVObject, [gi]);
+export default function Editor({selectTemplate}: Props) {
+    const {cfg, dispatch} = useConfig();
+    const conVars = useMemo(() => {
+        if (cfg.gi === null) return {} as KVObject
+        return cfg.gi["ConVars"] as KVObject
+    }, [cfg.gi]);
+
     const {
         categories,
         // addKV,
@@ -46,7 +49,7 @@ export default function Editor({gi, setGI, selectTemplate, template}: Props) {
         updateKV,
     } = useKVManager(conVars)
 
-    console.log("Editor: gi:", gi["ConVars"])
+    console.log("Editor: gi:", cfg.gi && cfg.gi["ConVars"])
     console.log("Editor: ConVars:", conVars)
     console.log("Editor: Categories from useKVManager:", categories)
 
@@ -72,10 +75,10 @@ export default function Editor({gi, setGI, selectTemplate, template}: Props) {
                     <FieldSet>
                         <FieldGroup>
                             <div className="grid grid-cols-2 gap-4">
-                                {template != "" &&
+                                {cfg.template != "" &&
                                     <Field>
                                         <FieldLabel>Template</FieldLabel>
-                                        <Select defaultValue={template} onValueChange={(e) => selectTemplate(e as Template)}>
+                                        <Select defaultValue={cfg.template} onValueChange={(e) => selectTemplate(e as Template)}>
                                             <SelectTrigger>
                                                 <SelectValue/>
                                             </SelectTrigger>
@@ -144,10 +147,10 @@ export default function Editor({gi, setGI, selectTemplate, template}: Props) {
                     <Field className="w-full flex items-end justify-end">
                         <ButtonGroup>
                             <ButtonGroup>
-                                <Button variant="destructive" className="cursor-pointer" onClick={() => setGI(null)}>Reset</Button>
+                                <Button variant="destructive" className="cursor-pointer" onClick={() => dispatch({type: 'set.gi', payload: null})}>Reset</Button>
                             </ButtonGroup>
 
-                            {template ===  "" && (
+                            {cfg.template ===  "" && (
                                 <ButtonGroup>
                                     <SelectTemplate selectTemplate={selectTemplate} variant="outline"/>
                                 </ButtonGroup>

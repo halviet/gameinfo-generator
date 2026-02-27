@@ -3,17 +3,16 @@ import Header from "@/components/header.tsx";
 import Dropzone from "@/components/ui/dropzone.tsx";
 import Disclaimer from "@/components/disclaimer.tsx";
 import {Toaster} from "@/components/ui/sonner.tsx";
-import {useState} from "react";
-import {type KVObject, parseGI} from "s2-gameinfo";
+import {parseGI} from "s2-gameinfo";
 import Editor from "@/components/editor.tsx";
 import SelectTemplate from "@/components/blocks/select-template.tsx";
 import {toast} from "sonner";
 import type {Template} from "./types/template";
+import {useConfig} from "@/context/context.tsx";
 
 
 function App() {
-    const [gi, setGI] = useState<KVObject | null>(null)
-    const [template, setTemplate] = useState<string>("")
+    const {cfg, dispatch} = useConfig();
 
     const fetchGiFile = async (filename: string): Promise<string> => {
         const response = await fetch(`template/gi/${filename}.gi`);
@@ -28,13 +27,22 @@ function App() {
             toast.error("No template was selected!");
             return;
         }
-        setTemplate(tmpl);
+        dispatch({
+            type: "set.template",
+            payload: tmpl,
+        })
 
         fetchGiFile(tmpl).then((r) => {
-            setGI(parseGI(r))
+            dispatch({
+                type: "set.gi",
+                payload: parseGI(r)
+            })
         }).catch((err) => {
             toast.error(err.message);
-            setTemplate("");
+            dispatch({
+                type: "set.template",
+                payload: '',
+            })
         })
     }
 
@@ -44,13 +52,13 @@ function App() {
             <main className="max-w-5xl w-full mx-auto h-full flex flex-col gap-8 justify-center items-center">
                 <Disclaimer/>
 
-                {(gi === null || gi === undefined) ?
+                {(cfg.gi === null || cfg.gi === undefined) ?
                     <EmptyConfig>
                         <SelectTemplate selectTemplate={selectTemplate}/>
                         or
-                        <Dropzone setGI={setGI}/>
+                        <Dropzone/>
                     </EmptyConfig>
-                    : <Editor gi={gi} setGI={setGI} selectTemplate={selectTemplate} template={template}/>
+                    : <Editor selectTemplate={selectTemplate}/>
                 }
 
                 <Toaster/>

@@ -3,14 +3,12 @@ import {useRef} from "react";
 import {Button} from "@/components/ui/button";
 import {Card} from "@/components/ui/card";
 import {Upload} from "lucide-react";
-import {type KVObject, parseGI} from "s2-gameinfo";
+import {parseGI} from "s2-gameinfo";
 import { toast } from "sonner";
+import {useConfig} from "@/context/context.tsx";
 
-interface Props {
-    setGI: React.Dispatch<React.SetStateAction<KVObject | null >>
-}
-
-export default function Dropzone({setGI}: Props) {
+export default function Dropzone() {
+    const {dispatch} = useConfig();
     const filePickerRef = useRef<HTMLInputElement>(null);
 
     const openFilePicker = () => {
@@ -30,7 +28,10 @@ export default function Dropzone({setGI}: Props) {
         }
 
         const gi = await file.text();
-        setGI(parseGI(gi));
+        dispatch({
+            type: "set.gi",
+            payload: parseGI(gi)
+        })
     };
 
     const onDropFiles = async (event: React.DragEvent) => {
@@ -47,7 +48,10 @@ export default function Dropzone({setGI}: Props) {
         }
 
         const gi = await file.text();
-        setGI(parseGI(gi));
+        dispatch({
+            type: "set.gi",
+            payload: parseGI(gi)
+        })
     };
 
     const onDragOver = (event: React.DragEvent) => {
