@@ -19,9 +19,6 @@ export function useKVManager(initCV: KVObject) {
         setCV(initCV);
     }, [initCV]);
 
-    console.log("useKVManager: initCV:", initCV);
-    console.log("useKVManager: cv:", cv);
-
     const categories = useMemo<CategoryKV[]>(() => {
         if (typeof cv !== "object" || Object.keys(cv).length === 0) {
             toast.error("Parsing error: Invalid or empty ConVars value. ConVars will be empty.");

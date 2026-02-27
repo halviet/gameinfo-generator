@@ -5,7 +5,8 @@ import {Card} from "@/components/ui/card";
 import {Upload} from "lucide-react";
 import {parseGI} from "s2-gameinfo";
 import { toast } from "sonner";
-import {useConfig} from "@/context/context.tsx";
+
+import {useConfig} from "@/hooks/useConfig.ts";
 
 export default function Dropzone() {
     const {dispatch} = useConfig();
@@ -27,11 +28,7 @@ export default function Dropzone() {
             return;
         }
 
-        const gi = await file.text();
-        dispatch({
-            type: "set.gi",
-            payload: parseGI(gi)
-        })
+        await setFile(file);
     };
 
     const onDropFiles = async (event: React.DragEvent) => {
@@ -47,11 +44,7 @@ export default function Dropzone() {
             return;
         }
 
-        const gi = await file.text();
-        dispatch({
-            type: "set.gi",
-            payload: parseGI(gi)
-        })
+        await setFile(file);
     };
 
     const onDragOver = (event: React.DragEvent) => {
@@ -60,7 +53,24 @@ export default function Dropzone() {
 
     const isValidFile = (file: File): boolean => {
         if (!file) return false;
-        return file.name.toLowerCase().endsWith('.gi');
+        return file.name.toLowerCase().endsWith('.gi') || file.name.toLowerCase().endsWith('.json');
+    }
+
+    const setFile = async (file: File) => {
+        const text = await file.text();
+
+        if (file.name.toLowerCase().endsWith('.gi')) {
+            dispatch({
+                type: "set.gi",
+                payload: parseGI(text)
+            })
+        }
+        if (file.name.toLowerCase().endsWith('.json')) {
+            dispatch({
+                type: "set.gi",
+                payload: JSON.parse(text)
+            })
+        }
     }
 
     return (
@@ -91,12 +101,12 @@ export default function Dropzone() {
                     ref={filePickerRef}
                     type="file"
                     className="hidden"
-                    accept=".gi"
+                    accept="application/json, text/plain, .gi"
                     multiple
                     onChange={onFileInputChange}
                 />
                 <span className="text-base/6 text-muted-foreground group-disabled:opacity-50 mt-2 block sm:text-xs">
-          Supported: .gi
+          Supported: .gi, .json
         </span>
             </Card>
         </div>

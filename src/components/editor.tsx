@@ -29,14 +29,15 @@ import {
 import SelectTemplate from "@/components/blocks/select-template.tsx";
 import type {Template} from "@/types/template.ts";
 import {useMemo} from "react";
-import {useConfig} from "@/context/context.tsx";
+
+import {useConfig} from "@/hooks/useConfig.ts";
 
 interface Props {
     selectTemplate: (template: Template) => void;
 }
 
 export default function Editor({selectTemplate}: Props) {
-    const {cfg, dispatch} = useConfig();
+    const {cfg, dispatch, exportGI, exportJSON} = useConfig();
     const conVars = useMemo(() => {
         if (cfg.gi === null) return {} as KVObject
         return cfg.gi["ConVars"] as KVObject
@@ -48,10 +49,6 @@ export default function Editor({selectTemplate}: Props) {
         removeKV,
         updateKV,
     } = useKVManager(conVars)
-
-    console.log("Editor: gi:", cfg.gi && cfg.gi["ConVars"])
-    console.log("Editor: ConVars:", conVars)
-    console.log("Editor: Categories from useKVManager:", categories)
 
     return (
         <div className="w-full flex flex-col gap-8">
@@ -138,8 +135,8 @@ export default function Editor({selectTemplate}: Props) {
                     <FieldGroup className="grid grid-cols-2 gap-4">
                         <Field>
                             <FieldLabel>Output file</FieldLabel>
-                            <Input id="output" type="text" defaultValue="gameinfo.gi"
-                                   placeholder="gameinfo.gi"/>
+                            <Input id="output" type="text" defaultValue={cfg.output}
+                                   placeholder={cfg.output}/>
                             <FieldDescription>Template description</FieldDescription>
                         </Field>
                     </FieldGroup>
@@ -157,7 +154,7 @@ export default function Editor({selectTemplate}: Props) {
                             )}
 
                             <ButtonGroup>
-                                <Button>Export</Button>
+                                <Button onClick={exportGI}>Export</Button>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button className="!pl-2">
@@ -166,7 +163,7 @@ export default function Editor({selectTemplate}: Props) {
                                     </DropdownMenuTrigger>
 
                                     <DropdownMenuContent>
-                                        <DropdownMenuItem>As JSON</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={exportJSON}>As JSON</DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </ButtonGroup>

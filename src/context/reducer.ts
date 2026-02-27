@@ -5,7 +5,7 @@ export const initialConfig: Config = {
     template: '',
     mods: true,
     modifyWholeGI: false,
-    output: 'gameinfo.gi'
+    output: 'gameinfo'
 }
 
 export function configReducer(s: Config, a: ConfigAction): Config {

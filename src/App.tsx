@@ -8,7 +8,8 @@ import Editor from "@/components/editor.tsx";
 import SelectTemplate from "@/components/blocks/select-template.tsx";
 import {toast} from "sonner";
 import type {Template} from "./types/template";
-import {useConfig} from "@/context/context.tsx";
+
+import {useConfig} from "@/hooks/useConfig.ts";
 
 
 function App() {

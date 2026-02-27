@@ -1,7 +1,9 @@
 import {Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
 import {IconFilesFilled} from "@tabler/icons-react";
+import InlineCode from "@/components/typography/code.tsx";
+import type {ReactNode} from "react";
 
-export default function EmptyConfig({children}: {children: React.ReactNode}) {
+export default function EmptyConfig({children}: {children: ReactNode}) {
     return (
         <Empty>
             <EmptyHeader>
@@ -9,11 +11,10 @@ export default function EmptyConfig({children}: {children: React.ReactNode}) {
                     <IconFilesFilled/>
                 </EmptyMedia>
 
-                <EmptyTitle>No config yet</EmptyTitle>
+                <EmptyTitle>No config loaded</EmptyTitle>
 
-                <EmptyDescription>
-                    You haven&apos;t created any projects yet. Get started by creating
-                    your first project.
+                <EmptyDescription className="flex flex-col gap-4">
+                    <p>Choose a pre-made template to get started quickly, or upload your existing <InlineCode>gameinfo.gi</InlineCode> file.</p>
                 </EmptyDescription>
             </EmptyHeader>
 
