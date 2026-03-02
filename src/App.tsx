@@ -7,7 +7,7 @@ import {parseGI} from "s2-gameinfo";
 import Editor from "@/components/editor.tsx";
 import SelectTemplate from "@/components/blocks/select-template.tsx";
 import {toast} from "sonner";
-import type {Template} from "./types/template";
+import {type Template, TEMPLATE_DEFAULT} from "./types/template";
 
 import {useConfig} from "@/hooks/useConfig.ts";
 
@@ -20,14 +20,10 @@ function App() {
         if (!response.ok) {
             throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
         }
-        return response.text(); // Get raw string content
+        return response.text();
     };
 
     const selectTemplate = (tmpl: Template) => {
-        if (tmpl === "") {
-            toast.error("No template was selected!");
-            return;
-        }
         dispatch({
             type: "set.template",
             payload: tmpl,
@@ -36,13 +32,21 @@ function App() {
         fetchGiFile(tmpl).then((r) => {
             dispatch({
                 type: "set.gi",
-                payload: parseGI(r)
+                payload: parseGI(r, {wrapDuplicates: true}),
+            })
+            dispatch({
+                type: "set.useTemplate",
+                payload: true
             })
         }).catch((err) => {
             toast.error(err.message);
             dispatch({
                 type: "set.template",
-                payload: '',
+                payload: TEMPLATE_DEFAULT,
+            })
+            dispatch({
+                type: "set.useTemplate",
+                payload: false
             })
         })
     }
@@ -53,13 +57,13 @@ function App() {
             <main className="max-w-5xl w-full mx-auto h-full flex flex-col gap-8 justify-center items-center">
                 <Disclaimer/>
 
-                {(cfg.gi === null || cfg.gi === undefined) ?
-                    <EmptyConfig>
+                {cfg.giLoaded ?
+                    <Editor selectTemplate={selectTemplate}/>
+                    : <EmptyConfig>
                         <SelectTemplate selectTemplate={selectTemplate}/>
                         or
                         <Dropzone/>
                     </EmptyConfig>
-                    : <Editor selectTemplate={selectTemplate}/>
                 }
 
                 <Toaster/>

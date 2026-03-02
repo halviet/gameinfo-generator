@@ -1,11 +1,11 @@
 import type { KVValue } from "s2-gameinfo";
 
 
-export const Categories = [
+export const CATEGORIES = [
     "HUD",
     "Shadows & Lightning",
 ] as const;
-export type Category = typeof Categories[number]
+export type Category = typeof CATEGORIES[number]
 
 export interface CV {
     name: string;

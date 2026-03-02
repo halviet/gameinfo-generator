@@ -1,5 +1,6 @@
 import {createContext, useContext} from "react";
-import type {Config, ConfigAction} from "@/types/context.ts";
+import type {Config} from "@/types/context.ts";
+import type {ConfigAction} from "@/context/reducer.ts";
 
 export interface ConfigContextType {
     cfg: Config;

@@ -1,8 +1,10 @@
 'use client'
 
-import type {KVObject} from "s2-gameinfo";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover.tsx";
-import {IconChevronDown, IconInfoCircle} from "@tabler/icons-react";
+import {
+    IconChevronDown,
+    IconInfoCircle,
+} from "@tabler/icons-react";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {
     Field,
@@ -15,7 +17,6 @@ import {
 } from "@/components/ui/field.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {Switch} from "./ui/switch";
-import KeyValue from "@/components/blocks/kv.tsx";
 import KVCategory from "@/components/blocks/kv-category.tsx";
 import {useKVManager} from "@/hooks/useKVManager.ts";
 import {ButtonGroup} from "@/components/ui/button-group.tsx";
@@ -27,10 +28,11 @@ import {
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
 import SelectTemplate from "@/components/blocks/select-template.tsx";
-import type {Template} from "@/types/template.ts";
-import {useMemo} from "react";
+import {type Template, TEMPLATES} from "@/types/template.ts";
 
 import {useConfig} from "@/hooks/useConfig.ts";
+import ButtonAddCV from "@/components/blocks/button-add-cv.tsx";
+import {Separator} from "@/components/ui/separator.tsx";
 
 interface Props {
     selectTemplate: (template: Template) => void;
@@ -38,20 +40,33 @@ interface Props {
 
 export default function Editor({selectTemplate}: Props) {
     const {cfg, dispatch, exportGI, exportJSON} = useConfig();
-    const conVars = useMemo(() => {
-        if (cfg.gi === null) return {} as KVObject
-        return cfg.gi["ConVars"] as KVObject
-    }, [cfg.gi]);
+    const categories = useKVManager()
 
-    const {
-        categories,
-        // addKV,
-        removeKV,
-        updateKV,
-    } = useKVManager(conVars)
+    const dev: boolean = false;
 
     return (
-        <div className="w-full flex flex-col gap-8">
+        <div className="w-full flex flex-col gap-8 relative">
+            {dev && (
+                <div className="fixed top-0 w-[1024px] h-80 bg-secondary rounded-lg p-2 flex gap-12 z-50">
+                    <div className="relative h-full w-[45%]">
+                        <span className="h-[8%]">Categories</span>
+                        <pre className="h-[92%] w-full overflow-y-scroll text-sm">
+                    {JSON.stringify(categories.map((v) => ({
+                        name: v.name,
+                        items: Object.fromEntries(v.items)
+                    })), null, 2)}
+                    </pre>
+                    </div>
+                    <Separator orientation="vertical"/>
+                    <div className="relative h-full w-[45%]">
+                        <span className="h-[8%]">GI</span>
+                        <pre className="h-[92%] w-full overflow-y-scroll text-sm">
+                    {JSON.stringify(cfg.gi, null, 2)}
+                    </pre>
+                    </div>
+                </div>
+            )}
+
             <section className="w-full flex flex-col gap-4">
                 <div className="flex gap-2 items-center">
                     <h1 className="scroll-m-20 text-2xl font-semibold tracking-tight">Basic</h1>
@@ -72,18 +87,20 @@ export default function Editor({selectTemplate}: Props) {
                     <FieldSet>
                         <FieldGroup>
                             <div className="grid grid-cols-2 gap-4">
-                                {cfg.template != "" &&
+                                {cfg.useTemplate &&
                                     <Field>
                                         <FieldLabel>Template</FieldLabel>
-                                        <Select defaultValue={cfg.template} onValueChange={(e) => selectTemplate(e as Template)}>
+                                        <Select defaultValue={cfg.template}
+                                                onValueChange={(e) => selectTemplate(e as Template)}>
                                             <SelectTrigger>
                                                 <SelectValue/>
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectGroup>
-                                                    <SelectItem value="piggy">Piggy</SelectItem>
-                                                    <SelectItem value="piggypidjan">Piggy's & pidjan</SelectItem>
-                                                    <SelectItem value="maihdenless">Maihdenless</SelectItem>
+                                                    {TEMPLATES.map((template) => (
+                                                        <SelectItem key={template}
+                                                                    value={template}>{template}</SelectItem>
+                                                    ))}
                                                 </SelectGroup>
                                             </SelectContent>
                                         </Select>
@@ -144,10 +161,11 @@ export default function Editor({selectTemplate}: Props) {
                     <Field className="w-full flex items-end justify-end">
                         <ButtonGroup>
                             <ButtonGroup>
-                                <Button variant="destructive" className="cursor-pointer" onClick={() => dispatch({type: 'set.gi', payload: null})}>Reset</Button>
+                                <Button variant="destructive" className="cursor-pointer"
+                                        onClick={() => dispatch({type: 'reset.gi'})}>Reset</Button>
                             </ButtonGroup>
 
-                            {cfg.template ===  "" && (
+                            {!cfg.useTemplate && (
                                 <ButtonGroup>
                                     <SelectTemplate selectTemplate={selectTemplate} variant="outline"/>
                                 </ButtonGroup>
@@ -158,7 +176,7 @@ export default function Editor({selectTemplate}: Props) {
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button className="!pl-2">
-                                            <IconChevronDown />
+                                            <IconChevronDown/>
                                         </Button>
                                     </DropdownMenuTrigger>
 
@@ -173,28 +191,28 @@ export default function Editor({selectTemplate}: Props) {
             </section>
 
             <section className="w-full flex flex-col gap-4">
-                <div className="flex gap-2 items-center">
-                    <h1 className="scroll-m-20 text-2xl font-semibold tracking-tight">ConVars</h1>
-                    <Popover>
-                        <PopoverTrigger>
-                            <IconInfoCircle/>
-                        </PopoverTrigger>
+                <div className="flex gap-2 justify-between items-center">
+                    <div className="flex gap-2 items-center">
+                        <h1 className="scroll-m-20 text-2xl font-semibold tracking-tight">ConVars</h1>
+                        <Popover>
+                            <PopoverTrigger>
+                                <IconInfoCircle/>
+                            </PopoverTrigger>
 
-                        <PopoverContent>
-                            <p className="text-popover-foreground text-sm">
-                                ConVars config options section
-                            </p>
-                        </PopoverContent>
-                    </Popover>
+                            <PopoverContent>
+                                <p className="text-popover-foreground text-sm">
+                                    ConVars config options section
+                                </p>
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+
+                    <ButtonAddCV/>
                 </div>
 
                 <div className="w-full flex flex-col gap-4">
                     {categories.map(category => (
-                        <KVCategory name={category.name} key={category.name}>
-                            {Array.from(category.items.entries()).map(([k, v]) => (
-                                <KeyValue key={k} kvKey={k} kvValue={v} updateKV={updateKV} removeKV={removeKV}/>
-                            ))}
-                        </KVCategory>
+                        <KVCategory category={category} key={category.name}/>
                     ))}
                 </div>
             </section>

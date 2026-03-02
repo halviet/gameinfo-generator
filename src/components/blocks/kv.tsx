@@ -9,7 +9,7 @@ import {
 import {useMemo, useState} from "react";
 import {cn, formatKVValueToString} from "@/lib/utils.ts";
 import type {KVValue} from "s2-gameinfo";
-import {Categories, ConVars} from "@/types/kv.ts";
+import {CATEGORIES, ConVars} from "@/types/kv.ts";
 import InlineCode from "@/components/typography/code.tsx";
 import {
     DropdownMenu,
@@ -22,16 +22,19 @@ import {
 } from "../ui/dropdown-menu";
 import {DropdownMenuTrigger} from "@/components/ui/dropdown-menu.tsx";
 import {Button} from "@/components/ui/button.tsx";
+import {useConfig} from "@/hooks/useConfig.ts";
 
 interface Props {
     kvKey: string
     kvValue: KVValue
-    updateKV: (name: string, newValue: KVValue, newName?: string) => void
-    removeKV: (name: string) => void
-    // moveKV: (name: string, category: string) => void
+    valIndex?: number
+    childOf?: string
+    disabled?: boolean
 }
 
-export default function KeyValue({kvKey, kvValue, updateKV, removeKV}: Props) {
+export default function KeyValue({kvKey, kvValue, valIndex, childOf, disabled = false}: Props) {
+    const {dispatch} = useConfig();
+
     const [intKey, setIntKey] = useState<string>(kvKey);
     const [intValue, setIntValue] = useState<string>(() => {
         // TODO: Formating KVValue
@@ -41,22 +44,51 @@ export default function KeyValue({kvKey, kvValue, updateKV, removeKV}: Props) {
     const onKeyBlur = (newKey: string) => {
         if (newKey === kvKey) return;
 
-        updateKV(kvKey, intValue, newKey);
+        console.log(`onKeyBlur: ${newKey} ${intValue}, kvKey: ${kvKey}, valIndex: ${valIndex}, childOf: ${childOf}`);
+
+        dispatch({
+            type: "set.gi.convar",
+            payload: {
+                key: newKey,
+                val: intValue,
+                index: valIndex,
+                childOf: childOf,
+            }
+        })
+
+        dispatch({
+            type: "remove.gi.convar",
+            payload: {
+                key: kvKey,
+                index: valIndex,
+                childOf: childOf,
+            }
+        })
     }
 
     const onValueBlur = (newValue: string) => {
         if (newValue === kvValue) return;
 
-        updateKV(intKey, newValue);
+        dispatch({
+            type: "set.gi.convar",
+            payload: {
+                key: intKey,
+                val: intValue,
+                index: valIndex,
+                childOf: childOf,
+            }
+        })
     }
 
     const onRemoveKV = () => {
-        removeKV(intKey)
+        dispatch({
+            type: "remove.gi.convar",
+            payload: {
+                key: intKey,
+                childOf: childOf,
+            }
+        })
     }
-
-    // const onMoveKV = (category: string) => {
-        // moveKV(intKey, category);
-    // }
 
     const [kvDescription, kvDefault] = useMemo(() => {
         const desc = ConVars.find((v) => v.name === intKey)?.description
@@ -106,23 +138,25 @@ export default function KeyValue({kvKey, kvValue, updateKV, removeKV}: Props) {
                 )}
                 onChange={e => setIntKey(e.target.value)}
                 onBlur={e => onKeyBlur(e.target.value)}
+                disabled={disabled}
             />
             <Separator orientation="vertical"/>
             <InputGroupInput
                 value={intValue}
                 style={{width: `calc(${intValue.length}ch + 1.5rem)`}}
                 className={cn(
-                    "font-mono text-center",
+                    "font-mono text-center pr-3!",
                 )}
                 onChange={e => setIntValue(e.target.value)}
                 onBlur={e => onValueBlur(e.target.value)}
+                disabled={disabled}
             />
 
             <Separator orientation="vertical"/>
 
             <InputGroupAddon className="pl-0 pr-2" align="inline-end">
                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
+                    <DropdownMenuTrigger asChild disabled={disabled}>
                         <Button variant="ghost" className="rounded-tl-none rounded-bl-none">
                             <IconDotsVertical/>
                         </Button>
@@ -132,7 +166,7 @@ export default function KeyValue({kvKey, kvValue, updateKV, removeKV}: Props) {
                             <DropdownMenuSubTrigger disabled className="opacity-50">Move to</DropdownMenuSubTrigger>
                             <DropdownMenuPortal>
                                 <DropdownMenuSubContent>
-                                    {Categories.map((v) => (
+                                    {CATEGORIES.map((v) => (
                                         <DropdownMenuItem
                                             // onClick={() => onMoveKV(v)}
                                         >{v}</DropdownMenuItem>

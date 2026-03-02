@@ -11,7 +11,7 @@
 - Importing
   - [x] .gi files
   - [x] .json files
-- [ ] Decomposing KV's with object inside to a smaller group (e.g. "rate" object)
+- [x] Decomposing KV's with object inside to a smaller group (e.g. "rate" object)
 - [ ] Adding new ConVars
 - [ ] Comment injection
 - [ ] Storing overall state in local storage
@@ -19,3 +19,4 @@
 - [ ] Add layout options for ConVars (e.g. wrap or list)
 - [ ] Highlighting duplicates
 - [ ] Encoded urls with templates (or even full ConVars)
+- [ ] ConVars search

@@ -62,7 +62,7 @@ export default function Dropzone() {
         if (file.name.toLowerCase().endsWith('.gi')) {
             dispatch({
                 type: "set.gi",
-                payload: parseGI(text)
+                payload: parseGI(text, {wrapDuplicates: true}),
             })
         }
         if (file.name.toLowerCase().endsWith('.json')) {

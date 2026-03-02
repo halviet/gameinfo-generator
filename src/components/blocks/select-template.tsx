@@ -11,7 +11,7 @@ import {Button} from "@/components/ui/button.tsx";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {useState} from "react";
 import {Field, FieldDescription, FieldLabel} from "@/components/ui/field.tsx";
-import type {Template} from "@/types/template.ts";
+import {type Template, TEMPLATE_DEFAULT, TEMPLATES} from "@/types/template.ts";
 
 interface Props {
     selectTemplate: (template: Template) => void
@@ -19,12 +19,11 @@ interface Props {
 }
 
 export default function SelectTemplate({selectTemplate, variant = "default"}: Props) {
-    const [tmpl, setTmpl] = useState<Template>("piggy")
+    const [tmpl, setTmpl] = useState<Template>(TEMPLATE_DEFAULT)
     const [open, setOpen] = useState<boolean>(false)
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-
             <DialogTrigger asChild>
                 <Button variant={variant}>Select template</Button>
             </DialogTrigger>
@@ -49,15 +48,15 @@ export default function SelectTemplate({selectTemplate, variant = "default"}: Pr
                     <div className="my-4">
                         <Field>
                             <FieldLabel>Template</FieldLabel>
-                            <Select defaultValue="piggy" onValueChange={(e) => setTmpl(e as Template)}>
+                            <Select defaultValue={TEMPLATE_DEFAULT} onValueChange={(e) => setTmpl(e as Template)}>
                                 <SelectTrigger className="min-w-60">
                                     <SelectValue/>
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectItem value="piggy">Piggy</SelectItem>
-                                        <SelectItem value="piggypidjan">Piggy's & pidjan</SelectItem>
-                                        <SelectItem value="maihdenless">Maihdenless</SelectItem>
+                                        {TEMPLATES.map((template) => (
+                                            <SelectItem key={template} value={template}>{template}</SelectItem>
+                                        ))}
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
