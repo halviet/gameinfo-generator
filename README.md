@@ -1,22 +1,16 @@
 # GameInfo Generator
 
-- [x] Decomposing GI object into KV's for Editor
-- [x] Listing ConVars grouped in Categories
-- [x] Linking KV's changes with main GI object
-- [x] Parsing templates
-- [x] ~~Linking Basic Config~~ Context Provider for configuration
-- Exporting
-  - [x] .gi file
-  - [x] .json file
-- Importing
-  - [x] .gi files
-  - [x] .json files
-- [x] Decomposing KV's with object inside to a smaller group (e.g. "rate" object)
-- [ ] Adding new ConVars
-- [ ] Comment injection
-- [ ] Storing overall state in local storage
-- [ ] Add functionality to inject ConVars into existing gameinfo.gi
-- [ ] Add layout options for ConVars (e.g. wrap or list)
-- [ ] Highlighting duplicates
-- [ ] Encoded urls with templates (or even full ConVars)
-- [ ] ConVars search
+GameInfo Generator is a browser-based editor for Deadlock's `gameinfo.gi` files. Start with a community preset, upload a `.gi` or `.json` file, or paste a `GIDocument` as JSON.
+
+[Open GameInfo Generator](https://halviet.github.io/gameinfo-generator/)
+
+- Search, add, edit, and delete ConVars, including their values, types, and comments.
+- Toggle mods support from Config options.
+- Rename drafts and reopen them in the same browser. Edits are saved locally in IndexedDB.
+- Preview and copy the generated `gameinfo.gi`, or download the config as `.gi` or JSON.
+
+The app uses `s2-gameinfo` to parse and generate config files in the browser.
+
+## Credits
+
+Thanks to Sqooky and the OptimizationLock contributors for collecting and maintaining the community configs available in the preset picker. [Sqooky/OptimizationLock](https://github.com/Sqooky/OptimizationLock)
