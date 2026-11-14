@@ -15,7 +15,7 @@ function findAddonConfig(document: GIDocument) {
 }
 
 function matches(entry: GIEntry, key: string, value?: string) {
-    return entry.kind === "value" && !entry.condition && entry.key === key
+    return entry.kind === "value" && !entry.commentedOut && !entry.condition && entry.key === key
         && (value === undefined || String(entry.value) === value);
 }
 

@@ -15,6 +15,7 @@ function validEntry(entry: unknown, depth = 0): entry is GIEntry {
         || !validComments(entry.leadingComments, true) || !validComments(entry.inlineComments)
         || (entry.condition !== undefined && typeof entry.condition !== "string")) return false;
 
+    if (entry.commentedOut !== undefined && (entry.kind !== "value" || typeof entry.commentedOut !== "boolean")) return false;
     if (entry.kind === "flag") return entry.condition === undefined;
     if (entry.kind === "block") {
         return validComments(entry.beforeCloseComments, true) && Array.isArray(entry.entries)

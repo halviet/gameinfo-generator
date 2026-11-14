@@ -62,7 +62,7 @@ export default function App() {
         setPasteError("");
         try {
             const text = await read();
-            const document = format === "json" ? parseConfigJSON(text) : parseGI(text);
+            const document = format === "json" ? parseConfigJSON(text) : parseGI(text, {parseCommentedConVars: true});
             if (document.root.kind !== "block" || document.root.key.toLowerCase() !== "gameinfo") {
                 throw new Error("Expected a GameInfo block.");
             }
